@@ -3,6 +3,7 @@ package station;
 import message_utils.message.Message;
 import message_utils.message_builder.Director;
 import message_utils.message_builder.MockMessageBuilder;
+import message_utils.message_serialization.MessageSerializer;
 
 public class MockStation implements Station{
     private final Director director;
@@ -20,6 +21,6 @@ public class MockStation implements Station{
     public void SendMessage() {
         this.director.BuildMessage();
         Message message = this.builder.getMessage();
-        System.out.println(message);
+        System.out.println(MessageSerializer.Serialize(message));
     }
 }
