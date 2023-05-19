@@ -48,7 +48,7 @@ public class Consumer {
 
         JSONParser parser = new JSONParser();
         Schema schema = new Schema.Parser().parse(new File(schemaFilePath));
-        
+
         String dir = "base-central-station/archive/";
         String subdir = "base-central-station/archive/";
         int countRecords = 0;
