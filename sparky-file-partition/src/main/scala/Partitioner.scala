@@ -24,9 +24,9 @@ object Partitioner {
       .mode(SaveMode.Append)
       .parquet(targetDir)
     fs.delete(new Path(dir), true)
-    println("old schema")
+    println("old schema: ")
     parquetFiles.printSchema()
-    println("new schema")
+    println("new schema:")
     parquetFiles.printSchema()
     println("processed " + count + " records")
   }
