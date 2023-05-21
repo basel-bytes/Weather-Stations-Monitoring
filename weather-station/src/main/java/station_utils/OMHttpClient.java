@@ -21,7 +21,7 @@ public class OMHttpClient {
             props.load(is);
             return props.getProperty("Open-Meteo-URI") + "latitude=" + latitude + "&longitude=" + longitude +
                     "&hourly=" + props.getProperty("hourly") + "&temperature_unit=" + props.getProperty("temperature_unit") +
-                    "&timeformat=" + props.getProperty("timeformat") + "&forecast_days=" + props.getProperty("forecast_days");
+                    "&timeformat=" + props.getProperty("time_format") + "&forecast_days=" + props.getProperty("forecast_days");
         } catch (IOException e) {
             return "";
         }
