@@ -1,4 +1,4 @@
-package station;
+package station_utils;
 
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
