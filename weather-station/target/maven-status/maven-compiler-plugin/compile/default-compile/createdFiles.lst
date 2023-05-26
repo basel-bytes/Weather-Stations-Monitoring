@@ -1,0 +1,13 @@
+message_utils\message_builder\Builder.class
+message_utils\message\Message.class
+message_utils\message_builder\AdapterMessageBuilder.class
+station\StationFactory.class
+station_utils\IDGenerator.class
+message_utils\message\BatteryStatus.class
+Main.class
+message_utils\message_builder\Director.class
+station_utils\OMHttpClient.class
+message_utils\message\Weather.class
+station\Station.class
+message_utils\message_builder\MockMessageBuilder.class
+message_utils\message_serialization\MessageSerializer.class
