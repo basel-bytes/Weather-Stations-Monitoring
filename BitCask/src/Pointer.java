@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Pointer {
     private String filePath;
     private Long byteOffset;
@@ -24,5 +27,19 @@ public class Pointer {
 
     public void setByteOffset(Long byteOffset) {
         this.byteOffset = byteOffset;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"filePath\":\"" + filePath + "\"," +
+                "\"byteOffset\":" + byteOffset +
+                '}';
+    }
+
+    public static Pointer pointerFromString(String pointerStr) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Pointer pointer = mapper.readValue(pointerStr, Pointer.class);
+        return pointer;
     }
 }

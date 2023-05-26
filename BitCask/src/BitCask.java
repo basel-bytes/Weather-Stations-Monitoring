@@ -1,60 +1,108 @@
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BitCask {
-
-    //LSM Tree
-    private LSMTree lsmTree;
-
-    private Long tree_size_in_bytes = 0L;
-
-    public Long getTree_size_in_bytes() {
-        return tree_size_in_bytes;
-    }
-
-    private final Long threshold_size = 1000000L; //threshold size is (Tree size = 1 MB)
+    private final Long threshold_size = 10000L; //threshold size is (Tree size = 1 MB)
     //Segments
-    private SegmentsHandler segmentsHandler;
+    private SegmentsReader segmentsReader;
     private String segmentsPath;
     private int segment_no = 0;
     //HashTable
     private HashMap<String, Pointer> hashTable;
 
+    private  ActiveSegment activeSegment;
 
-    public BitCask(String segmentsPath) {
+    private CompactionTask compactionTask;
+
+
+    public BitCask(String segmentsPath) throws Exception {
         this.segmentsPath = segmentsPath;
-        this.lsmTree = new LSMTree();
-        this.segmentsHandler = new SegmentsHandler();
+        this.segmentsReader = new SegmentsReader();
         this.hashTable = new HashMap<>();
-    }
-
-
-    boolean reachedMaxSize(){
-        return tree_size_in_bytes > threshold_size;
+        this.activeSegment = null;
+        recoverMeIfYouCan();
+        this.compactionTask = new CompactionTask(segmentsPath);
     }
 
     public void write(String key, String value) throws IOException {
-        lsmTree.insert(key, value);
-        tree_size_in_bytes += key.length() + value.length();
-        if(tree_size_in_bytes > threshold_size){
-            System.out.println("((((((((((((((((Flushing))))))))))))))))");
-            segmentsHandler.flushLSMTree(lsmTree, segmentsPath, segment_no, hashTable);
-            segment_no++;
-            lsmTree = new LSMTree<String, String>();
-            tree_size_in_bytes = 0L;
+        if(activeSegment == null){
+            activeSegment = new ActiveSegment(segmentsPath ,"segment" + segment_no);
         }
+        if(activeSegment.reachedMaxSize()){
+            activeSegment.wrapItUpandClose();
+            segment_no++;
+            activeSegment = new ActiveSegment(segmentsPath, "segment" + segment_no);
+        }
+        activeSegment.write(key, value, hashTable);
     }
 
     public String read(String key) throws IOException {
-        String val = (String) lsmTree.search(key);
-        if(val != null){
-            return val;
+        if(!hashTable.containsKey(key)){
+            return null;
         }else{
-            if(hashTable.containsKey(key)){
-                return segmentsHandler.getMeThisValue(hashTable.get(key));
-            }else{
-                return null;
+            return segmentsReader.getMeThisValue(hashTable.get(key));
+        }
+    }
+
+    public void recoverMeIfYouCan() throws Exception {
+        List<String> hintFiles = getHintFiles();
+        String activeFileName = getActiveSegment();
+        if(activeFileName != null){
+            this.activeSegment = new ActiveSegment(segmentsPath, activeFileName.substring(0, activeFileName.length() - 4));
+            SegmentsReader.readActiveFile_recovery(segmentsPath + "/" + activeFileName, this.hashTable);
+        }
+        if(hintFiles != null){
+            for(String hintFileName : hintFiles){
+                SegmentsReader.readAHintFile_recovery(segmentsPath + "/" + hintFileName, this.hashTable);
             }
         }
     }
+
+    private List<String> getHintFiles() throws Exception {
+        File directory = new File(this.segmentsPath);
+        // Check if the specified path is a directory
+        if (directory.isDirectory()) {
+            // Get all files and directories within the specified directory
+            File[] files = directory.listFiles();
+            List<String> filtered_files = Arrays.stream(files).filter(file -> file.getName()
+                            .contains("hint")).map(file -> file.getName())
+                            .collect(Collectors.toList());
+            filtered_files.sort(Comparator.comparingInt(BitCask::extractNumber).reversed());
+            return filtered_files.isEmpty() ? null : filtered_files;
+        } else {
+            throw new Exception("The specified path is not a directory.");
+        }
+    }
+
+    private String getActiveSegment() throws Exception {
+        File directory = new File(this.segmentsPath);
+        if (directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            List<String> filtered_files = Arrays.stream(files).filter(file -> file.getName()
+                            .contains("segment")).map(file -> file.getName())
+                    .collect(Collectors.toList());
+            filtered_files = filtered_files.stream().filter(file -> !file.contains("replica")).collect(Collectors.toList());
+            filtered_files.sort(Comparator.comparingInt(BitCask::extractNumber).reversed());
+            return filtered_files.isEmpty() ? null : filtered_files.get(0);
+        } else {
+            throw new Exception("The specified path is not a directory.");
+        }
+    }
+
+
+    private static int extractNumber(String fileName) {
+        int startIndex = fileName.indexOf("segment") + "segment".length();
+        int endIndex = fileName.indexOf(".bin");
+
+        String numberString = fileName.substring(startIndex, endIndex);
+        return Integer.parseInt(numberString);
+    }
+
+
+
 }
