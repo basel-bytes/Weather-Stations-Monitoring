@@ -4,7 +4,7 @@ ThisBuild / scalaVersion := "2.13.10"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "sparky-file-partition"
+    name := "sparky-file-partition-deployment.yaml"
   )
 
 libraryDependencies ++= Seq(
