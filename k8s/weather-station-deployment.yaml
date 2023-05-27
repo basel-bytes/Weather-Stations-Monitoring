@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-station-deployment
+  labels:
+    component: station
+
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      component: station
+  template:
+    metadata:
+      labels:
+        component: station
+    spec:
+      containers:
+        - name: weather-station-container
+          image: weather-station-image
+          imagePullPolicy: Never
+          env:
+            - name: stationType
+              value: "Mock"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: OM-weather-station-deployment
+  labels:
+    component: OM_station
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: OM_station
+  template:
+    metadata:
+      labels:
+        component: OM_station
+    spec:
+      containers:
+        - name: om_weather-station-container
+          image: weather-station-image
+          imagePullPolicy: Never
+          env:
+            - name: stationType
+              value: "OM"
+            - name: longitudeOM
+              value: "21.256"
+            - name: latitudeOM
+              value: "31.78"

@@ -16,10 +16,12 @@ public class StationFactory {
         Builder builder;
         long sleepingTime;
         if(Objects.equals(parameters[0], "Mock")) {
+            System.out.println("Mock Station Created.... :)");
             builder = new MockMessageBuilder(stationID);
             sleepingTime = 1000;
         }
         else{
+            System.out.println("Open Meteo Adapter Station Created.... :)");
             builder = new AdapterMessageBuilder(stationID, Float.parseFloat(parameters[1]), Float.parseFloat(parameters[2]));
             sleepingTime = 60000 * 60;
         }
