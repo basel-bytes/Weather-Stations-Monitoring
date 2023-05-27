@@ -7,7 +7,6 @@ import org.apache.commons.math3.util.Pair;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
