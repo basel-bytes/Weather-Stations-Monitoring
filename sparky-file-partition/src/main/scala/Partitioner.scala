@@ -9,8 +9,8 @@ object Partitioner {
     .master ("local")
     .getOrCreate ();
 
-    val path = "/home/basel/IdeaProjects/Weather-Stations-Monitoring/base-central-station"
-    val targetDir = s"$path/archive"
+//    val path = "/home/basel/IdeaProjects/Weather-Stations-Monitoring/base-central-station"
+    val targetDir = "archive"
     val dir = s"$targetDir/" + java.time.LocalDate.now()
     val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
 

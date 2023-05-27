@@ -23,12 +23,12 @@ import java.util.*;
 
 public class Consumer {
     private static final int BATCH_SIZE = 10000;
-    private static final String schemaFilePath = "src/main/java/archiving/schema.avsc";
+    private static final String schemaFilePath = "base-central-station/src/main/java/archiving/schema.avsc";
     private static final Logger log = LoggerFactory.getLogger(Consumer.class);
 
     public static Properties getProps() {
         Properties pros = new Properties();
-        pros.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-service:9092");
+        pros.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         pros.put(ConsumerConfig.GROUP_ID_CONFIG, "group1");
         pros.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         pros.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -48,9 +48,9 @@ public class Consumer {
         JSONParser parser = new JSONParser();
         Schema schema = new Schema.Parser().parse(new File(schemaFilePath));
 
-        BitCask bitCask = new BitCask("bitCaskStore");
-        String dir = "archive/";
-        String subdir = "archive/";
+//        BitCask bitCask = new BitCask("bitCaskStore");
+        String dir = "base-central-station/archive/";
+        String subdir = "base-central-station/archive/";
         String filePath = null;
         int countRecords = 0;
         ParquetWriter parquetWriter = null;
@@ -72,7 +72,7 @@ public class Consumer {
                 countRecords += records.count();
                 for (ConsumerRecord<String, String> r : records) {
                     JSONObject obj = (JSONObject) parser.parse(r.value());
-                    bitCask.write(Long.toString((Long) obj.get("station_id")), r.value());
+//                    bitCask.write(Long.toString((Long) obj.get("station_id")), r.value());
                     GenericRecord record = Avro.getRecord(obj, schema);
                     log.info("Consumed message :" + record);
                     parquetWriter.write(record);
