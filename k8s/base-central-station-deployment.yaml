@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: base-central-station-deployment
+  labels:
+    app: base
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: base
+  template:
+    metadata:
+      labels:
+        app: base
+    spec:
+      containers:
+        - name: base-central-station
+          image: base-central-station-image:latest
+          imagePullPolicy: Never
