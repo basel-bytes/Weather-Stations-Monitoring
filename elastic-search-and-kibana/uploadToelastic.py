@@ -1,12 +1,10 @@
 from elasticsearch import Elasticsearch
 import pyarrow.parquet as pq
 from confluent_kafka import Consumer, KafkaException
-import requests
 
 # Create Kafka consumer configuration
 conf = {
     'bootstrap.servers': 'http://localhost:9092',
-    'group.id': 'your_consumer_group_id',
     'auto.offset.reset': 'earliest'  # Start consuming from the beginning of the topic
 }
 
@@ -14,7 +12,7 @@ conf = {
 consumer = Consumer(conf)
 
 # Subscribe to the Kafka topic(s) you want to consume from
-consumer.subscribe(['parquet'])
+consumer.subscribe(['paths_topic'])
 
 try:
     while True:
@@ -49,10 +47,10 @@ try:
         # Bulk index documents into Elasticsearch
         bulk_data = []
         for doc in documents:
-            bulk_data.append({'index': {'_index': 'test'}})
+            bulk_data.append({'index': {'_index': 'weather'}})
             bulk_data.append(doc)
 
-        es.bulk(index='test', body=bulk_data)
+        es.bulk(index='weather', body=bulk_data)
 
 
 except KeyboardInterrupt:
