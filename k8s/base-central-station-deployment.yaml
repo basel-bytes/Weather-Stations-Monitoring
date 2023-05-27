@@ -14,7 +14,18 @@ spec:
       labels:
         app: base
     spec:
+      volumes:
+        - name: base-storage
+          persistentVolumeClaim:
+            claimName: archive-persistent-volume-claim
       containers:
         - name: base-central-station
           image: base-central-station-image:latest
+          volumeMounts:
+            - name: base-storage
+              mountPath: /archive
+              subPath: archive
+            - name: base-storage
+              mountPath: /bitCaskStore
+              subPath: bitCaskStore
           imagePullPolicy: Never

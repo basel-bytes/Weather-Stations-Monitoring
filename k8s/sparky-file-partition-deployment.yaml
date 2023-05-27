@@ -18,7 +18,7 @@ spec:
             claimName: archive-volume-claim
       containers:
         - name: sparky-file-partition
-          image: sparky-file-partition-image
+          image: sparky-file-partition-image:latest
           imagePullPolicy: Never
           volumeMounts:
             - name: sparky-storage
