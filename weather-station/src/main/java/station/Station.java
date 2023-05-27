@@ -43,6 +43,7 @@ public class Station {
         while (true){
             this.director.BuildMessage();
             Message message = this.builder.getMessage();
+            System.out.println(message.toString());
             ProducerRecord<String, String> record = new ProducerRecord<>(topicName, MessageSerializer.Serialize(message));
             this.kafkaProducer.send(record);
             Thread.sleep(sleepingTime);

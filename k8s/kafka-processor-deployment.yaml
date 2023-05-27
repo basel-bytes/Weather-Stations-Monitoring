@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-processor-deployment
+  labels:
+    component: kafka-processor-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: kafka-processor-deployment
+
+  template:
+    metadata:
+      labels:
+        component: kafka-processor-deployment
+
+    spec:
+      containers:
+        - name: kafka-processor-container
+          image: kafka-processor-image
+          imagePullPolicy: Never
