@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
@@ -24,6 +25,7 @@ public class Main {
     };
 
     public static void main(String[] args) throws IOException {
+        System.out.println("Hello from Kafka Processor :)");
         Properties config = loadProperties();
 
         List<Pair<Boolean, Double>> dropPercentages = new ArrayList<>();
@@ -31,23 +33,28 @@ public class Main {
         dropPercentages.add(new Pair<>(false, 0.9));
         EnumeratedDistribution<Boolean> dropDecider = new EnumeratedDistribution<>(dropPercentages);
 
-        StreamsBuilder builder = new StreamsBuilder();
+        NewTopic droopedTopic = new NewTopic("dropped", 1, (short) 1);
+        NewTopic weatherTopic = new NewTopic("weather_topic", 1, (short) 1);
+        NewTopic rainingTopic = new NewTopic("raining", 1, (short) 1);
 
+        StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> inputStream = builder.stream("processor_topic");
+
         inputStream.peek((key, value) -> System.out.println("key: " + key + " value: " + value))
                    .filter((key, value) -> dropDecider.sample())
                    .peek((key, value) -> System.out.println("Dropped: " + " value: " + value))
-                   .to("deadLetter");
+                   .to("dropped");
 
         inputStream.peek((key, value) -> System.out.println("key: " + key + " value: " + value))
-                .filterNot((key, value) -> dropDecider.sample())
-                .peek((key, value) -> System.out.println("Not Dropped: " + " value: " + value))
-                .to("weather_topic");
+                   .filterNot((key, value) -> dropDecider.sample())
+                   .peek((key, value) -> System.out.println("Not Dropped: " + " value: " + value))
+                   .to("weather_topic");
 
-        KStream<String, String> unDroppedStream = builder.stream("weather_topic");
-        unDroppedStream.filter((key, value) -> splitter.apply(value).humidity > 70)
-                       .peek((key, value) -> System.out.println("Raining at " + value))
-                       .to("special");
+        inputStream.peek((key, value) -> System.out.println("key: " + key + " value: " + value))
+                   .filterNot((key, value) -> dropDecider.sample())
+                   .filter((key, value) -> splitter.apply(value).humidity > 70)
+                   .peek((key, value) -> System.out.println("Raining at " + value))
+                   .to("raining");
 
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();
