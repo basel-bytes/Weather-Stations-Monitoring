@@ -13,15 +13,19 @@ import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
 public class Consumer {
-
     private static final int BATCH_SIZE = 10000;
     private static final String schemaFilePath = "src/main/java/archiving/schema.avsc";
+    private static final Logger log = LoggerFactory.getLogger(Consumer.class);
+
     public static Properties getProps() {
         Properties pros = new Properties();
         pros.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-service:9092");
@@ -47,6 +51,7 @@ public class Consumer {
         BitCask bitCask = new BitCask("bitCaskStore");
         String dir = "archive/";
         String subdir = "archive/";
+        String filePath = null;
         int countRecords = 0;
         ParquetWriter parquetWriter = null;
 
@@ -58,9 +63,10 @@ public class Consumer {
                     subdir = dir + currentDay + "/";
                 }
                 ConsumerRecords<String, String> records = consumer.poll(1000 * 60);
-                System.out.println(records.count());
+                log.info("\u001B[32m" + "Number of polled messages = " + records.count() + "\u001B[0m");
                 if (countRecords == 0) {
-                    Path path = new Path(subdir + UUID.randomUUID() + ".parquet");
+                    filePath = subdir + UUID.randomUUID() + ".parquet";
+                    Path path = new Path(filePath);
                     parquetWriter = createParquetWriter(path, schema);
                 }
                 countRecords += records.count();
@@ -68,11 +74,12 @@ public class Consumer {
                     JSONObject obj = (JSONObject) parser.parse(r.value());
                     bitCask.write(Long.toString((Long) obj.get("station_id")), r.value());
                     GenericRecord record = Avro.getRecord(obj, schema);
-                    System.out.println(record);
+                    log.info("Consumed message :" + record);
                     parquetWriter.write(record);
                 }
                 if (countRecords >= BATCH_SIZE) {
                     parquetWriter.close();
+                    PathsProducer.produce(filePath);
                     countRecords = 0;
                 }
             }
