@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sparky-file-partition-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: sparky
+  template:
+    metadata:
+      labels:
+        component: sparky
+    spec:
+      volumes:
+        - name: sparky-storage
+          persistentVolumeClaim:
+            claimName: archive-volume-claim
+      containers:
+        - name: sparky-file-partition
+          image: sparky-file-partition-image
+          imagePullPolicy: Never
+          volumeMounts:
+            - name: sparky-storage
+              mountPath: /archive
+              subPath: archive
