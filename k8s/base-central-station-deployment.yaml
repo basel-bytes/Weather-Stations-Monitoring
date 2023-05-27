@@ -14,15 +14,7 @@ spec:
       labels:
         app: base
     spec:
-      volumes:
-        - name: base-storage
-          persistentVolumeClaim:
-            claimName: archive-volume-claim
       containers:
         - name: base-central-station
-          image: base-central-station-image
+          image: base-central-station-image:latest
           imagePullPolicy: Never
-          volumeMounts:
-            - name: base-storage
-              mountPath: /archive
-              subPath: archive

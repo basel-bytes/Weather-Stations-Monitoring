@@ -1,6 +1,5 @@
 package archiving;
 
-import archiving.Avro;
 import bitcask.BitCask;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -14,7 +13,6 @@ import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -23,10 +21,10 @@ import java.util.*;
 public class Consumer {
 
     private static final int BATCH_SIZE = 10000;
-    private static final String schemaFilePath = "base-central-station/src/main/java/archiving/schema.avsc";
+    private static final String schemaFilePath = "src/main/java/archiving/schema.avsc";
     public static Properties getProps() {
         Properties pros = new Properties();
-        pros.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        pros.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-service:9092");
         pros.put(ConsumerConfig.GROUP_ID_CONFIG, "group1");
         pros.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         pros.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -46,7 +44,7 @@ public class Consumer {
         JSONParser parser = new JSONParser();
         Schema schema = new Schema.Parser().parse(new File(schemaFilePath));
 
-        BitCask bitCask = new BitCask("base-central-station/bitCaskStore/");
+        BitCask bitCask = new BitCask("bitCaskStore");
         String dir = "archive/";
         String subdir = "archive/";
         int countRecords = 0;

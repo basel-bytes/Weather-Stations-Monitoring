@@ -4,6 +4,7 @@ WORKDIR /base-central-station
 
 COPY src ./src
 COPY pom.xml .
+COPY bitCaskStore ./bitCaskStore
 
 RUN mvn clean install
 
