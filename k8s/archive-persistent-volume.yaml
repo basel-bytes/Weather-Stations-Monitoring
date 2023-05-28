@@ -9,4 +9,4 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: $HOME"/mnt/data"
+    path: "/home/basel/mnt/data"

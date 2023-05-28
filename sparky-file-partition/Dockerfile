@@ -4,9 +4,7 @@ WORKDIR /sparky
 
 COPY build.sbt .
 COPY archive ./archive
-
-RUN sbt compile
-
-COPY . .
+COPY src ./src
+RUN sbt clean compile
 
 CMD ["sbt", "run"]

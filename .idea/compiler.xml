@@ -7,12 +7,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="weather-station" />
+        <module name="kafka-processor" />
         <module name="base-central-station" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="kafka-processor" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

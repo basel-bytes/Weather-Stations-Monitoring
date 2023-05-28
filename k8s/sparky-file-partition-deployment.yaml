@@ -12,7 +12,6 @@ spec:
       labels:
         component: sparky
     spec:
-      activeDeadlineSeconds: 86400
       volumes:
         - name: sparky-storage
           persistentVolumeClaim:

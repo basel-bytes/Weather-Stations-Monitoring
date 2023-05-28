@@ -3,7 +3,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: archive-persistent-volume-claim
 spec:
-  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
