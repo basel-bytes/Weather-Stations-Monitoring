@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: elastic&kibana-deployment
+  name: elastic-kibana-deployment
   labels:
     app: elastic-kibana
 spec:
@@ -16,7 +16,7 @@ spec:
         app: elastic-kibana
     spec:
       containers:
-        - name: elastic&kibana-deployment
+        - name: elastic-kibana-deployment
           image: nshou/elasticsearch-kibana
           imagePullPolicy: IfNotPresent
       restartPolicy: Always

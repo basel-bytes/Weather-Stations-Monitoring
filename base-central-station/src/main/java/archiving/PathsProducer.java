@@ -12,7 +12,7 @@ public class PathsProducer {
 
     public static Properties getProps() {
         Properties pros = new Properties();
-        pros.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        pros.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-service:9092");
         pros.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         pros.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         return pros;

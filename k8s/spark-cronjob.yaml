@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: spark-cronjob
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: spark-cronjob
+              image: busybox:latest
+              imagePullPolicy: IfNotPresent
+              command: ["kubectl", "apply", "-f", "sparky-file-partition.yaml"]
+          restartPolicy: OnFailure
