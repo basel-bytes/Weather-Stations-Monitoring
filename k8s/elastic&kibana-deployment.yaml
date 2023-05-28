@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic&kibana-deployment
+  labels:
+    app: elastic-kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elastic-kibana
+  template:
+    metadata:
+      name: elastic&kibana-deployment
+      labels:
+        app: elastic-kibana
+    spec:
+      containers:
+        - name: elastic&kibana-deployment
+          image: nshou/elasticsearch-kibana
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      
