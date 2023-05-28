@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-loader-deployment
+  labels:
+    component: elastic-loader-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: elastic-loader-deployment
+
+  template:
+    metadata:
+      labels:
+        component: elastic-loader-deployment
+
+    spec:
+      containers:
+        - name: elastic-loader-container
+          image: elastic-loader-image:latest
+          imagePullPolicy: Never
