@@ -4,7 +4,7 @@ from confluent_kafka import Consumer, KafkaException
 
 # Create Kafka consumer configuration
 conf = {
-    'bootstrap.servers': 'elastic-cluster-ip:9092',
+    'bootstrap.servers': 'kafka-service:9092',
     'group.id': 'weather_group',
     'auto.offset.reset': 'earliest'  # Start consuming from the beginning of the topic
 }
@@ -46,7 +46,7 @@ try:
 
         print(len(documents))
         # Create Elasticsearch connection
-        es = Elasticsearch(['http://elastic-cluster-ip:9200'], timeout=30)
+        es = Elasticsearch(['http://elastic-service:9200'], timeout=30)
 
         # Bulk index documents into Elasticsearch
         bulk_data = []
