@@ -20,6 +20,9 @@ spec:
             claimName: archive-persistent-volume-claim
       containers:
         - name: base-central-station
+          env:
+            - name: BATCH_SIZE
+              value: "10000"
           image: base-central-station-image:latest
           volumeMounts:
             - name: base-storage
