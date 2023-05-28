@@ -18,5 +18,5 @@ spec:
     spec:
       containers:
         - name: kafka-processor-container
-          image: kafka-processor-image
+          image: kafka-processor-image:latest
           imagePullPolicy: Never

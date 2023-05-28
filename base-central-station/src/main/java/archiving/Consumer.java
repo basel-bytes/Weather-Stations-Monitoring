@@ -23,12 +23,12 @@ import java.util.*;
 
 public class Consumer {
     private static final int BATCH_SIZE = 10000;
-    private static final String schemaFilePath = "base-central-station/src/main/java/archiving/schema.avsc";
+    private static final String schemaFilePath = "src/main/java/archiving/schema.avsc";
     private static final Logger log = LoggerFactory.getLogger(Consumer.class);
 
     public static Properties getProps() {
         Properties pros = new Properties();
-        pros.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        pros.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-service:9092");
         pros.put(ConsumerConfig.GROUP_ID_CONFIG, "group1");
         pros.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         pros.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -49,8 +49,8 @@ public class Consumer {
         Schema schema = new Schema.Parser().parse(new File(schemaFilePath));
 
 //        BitCask bitCask = new BitCask("bitCaskStore");
-        String dir = "base-central-station/archive/";
-        String subdir = "base-central-station/archive/";
+        String dir = "archive/";
+        String subdir = "archive/";
         String filePath = null;
         int countRecords = 0;
         ParquetWriter parquetWriter = null;

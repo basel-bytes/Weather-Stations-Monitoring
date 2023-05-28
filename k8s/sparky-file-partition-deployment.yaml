@@ -12,10 +12,11 @@ spec:
       labels:
         component: sparky
     spec:
+      activeDeadlineSeconds: 86400
       volumes:
         - name: sparky-storage
           persistentVolumeClaim:
-            claimName: archive-volume-claim
+            claimName: archive-persistent-volume-claim
       containers:
         - name: sparky-file-partition
           image: sparky-file-partition-image:latest
