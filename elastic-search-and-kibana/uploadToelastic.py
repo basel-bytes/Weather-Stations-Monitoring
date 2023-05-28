@@ -4,7 +4,8 @@ from confluent_kafka import Consumer, KafkaException
 
 # Create Kafka consumer configuration
 conf = {
-    'bootstrap.servers': 'http://localhost:9092',
+    'bootstrap.servers': 'elastic-cluster-ip:9092',
+    'group.id': 'weather_group',
     'auto.offset.reset': 'earliest'  # Start consuming from the beginning of the topic
 }
 
@@ -15,6 +16,7 @@ consumer = Consumer(conf)
 consumer.subscribe(['paths_topic'])
 
 try:
+    print('start listensing')
     while True:
         # Poll for new messages
         msg = consumer.poll(timeout=1.0)  # Set timeout to control the frequency of consuming
@@ -22,13 +24,15 @@ try:
         if msg is None:
             continue  # No new messages, continue to the next iteration
 
-        if msg.error():
-            if msg.error().code() == KafkaException._PARTITION_EOF:
-                continue  # Reached end of partition, continue to the next iteration
-            else:
-                print(f"Error occurred: {msg.error().str()}")
-                break
+        # if msg.error():
+        #     if msg.error().code() == KafkaError._PARTITION_EOF:
+        #         # Reached end of partition, continue to the next iteration
+        #         continue
+        #     else:
+        #         print(f"Error occurred: {msg.error().str()}")
+        #         break
 
+        print('get message from kafka topic : paths_topic')
         # Process the consumed message
         parquet_file = msg.value().decode('utf-8')  # Assuming the message value is a string
         # Read Parquet file
@@ -42,15 +46,16 @@ try:
 
         print(len(documents))
         # Create Elasticsearch connection
-        es = Elasticsearch(['http://localhost:9200'])
+        es = Elasticsearch(['http://elastic-cluster-ip:9200'], timeout=30)
 
         # Bulk index documents into Elasticsearch
         bulk_data = []
         for doc in documents:
-            bulk_data.append({'index': {'_index': 'weather'}})
+            bulk_data.append({'index': {'_index': 'weather_topic'}})
             bulk_data.append(doc)
 
-        es.bulk(index='weather', body=bulk_data)
+        es.bulk(index='weather_topic', body=bulk_data)
+        print('upload parquet file')
 
 
 except KeyboardInterrupt:

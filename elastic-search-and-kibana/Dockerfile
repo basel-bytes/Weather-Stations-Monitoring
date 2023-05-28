@@ -1,7 +1,7 @@
 FROM python:3.8
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /elasticsearch
 
 # Copy the script file into the container
 COPY uploadToelastic.py .
