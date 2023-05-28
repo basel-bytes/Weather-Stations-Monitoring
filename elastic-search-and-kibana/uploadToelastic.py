@@ -32,9 +32,12 @@ try:
         #         print(f"Error occurred: {msg.error().str()}")
         #         break
 
-        print('get message from kafka topic : paths_topic')
+        print('get message from kafka topic: ', msg)
         # Process the consumed message
         parquet_file = msg.value().decode('utf-8')  # Assuming the message value is a string
+        if not os.path.isfile(parquet_file):
+            print(f"File not found: {parquet_file}")
+            continue  # Skip to the next iteration if file not found
         # Read Parquet file
         parquet_table = pq.read_table(parquet_file)
 

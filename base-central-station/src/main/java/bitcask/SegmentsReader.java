@@ -23,16 +23,18 @@ public class SegmentsReader {
     }
 
     public static void readAHintFile_recovery(String hintFilePath, HashMap<String, Pointer> hashTable) throws IOException {
+        System.out.println("readAHintFile_recovery");
+        System.out.println(hintFilePath);
         RandomAccessFile file = new RandomAccessFile(hintFilePath, "rw");
         Long len = file.length();
         Long read_bytes = 0L;
+        System.out.println(len);
         HashMap<String, Pointer> tmp_table = new HashMap<>();
         while (read_bytes < len) {
             file.seek(read_bytes);
             Long timestamp = file.readLong();
             int key_size = file.readInt();
             int pointer_size = file.readInt();
-
             file.seek(read_bytes + 16);
 
             byte[] buffer_key = new byte[key_size];
@@ -79,6 +81,7 @@ public class SegmentsReader {
             byte[] buffer_key = new byte[key_size];
             file.readFully(buffer_key);
             String key = new String(buffer_key, StandardCharsets.UTF_8);
+            System.out.println(key + "#" + len);
             //store in map
             Pointer pointer = new Pointer(activeFilePath, read_bytes);
             hashTable.put(key, pointer);

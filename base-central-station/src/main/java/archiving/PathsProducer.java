@@ -20,7 +20,7 @@ public class PathsProducer {
 
     public static void produce(String message) {
         System.out.println("\u001B[34m" + "parquet file path : " + message + "\u001B[0m");
-        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("paths_topics", message);
+        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("paths_topic", message);
         producer.send(producerRecord);
     }
 

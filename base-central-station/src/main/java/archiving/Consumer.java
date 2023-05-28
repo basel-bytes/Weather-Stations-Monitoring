@@ -1,6 +1,6 @@
 package archiving;
 
-import bitcask.BitCask;
+import bitcask.*;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.fs.Path;
@@ -9,6 +9,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.parquet.Exceptions;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.json.simple.JSONObject;
@@ -22,7 +23,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class Consumer {
-    private static final int BATCH_SIZE = 10000;
     private static final String schemaFilePath = "src/main/java/archiving/schema.avsc";
     private static final Logger log = LoggerFactory.getLogger(Consumer.class);
 
@@ -42,6 +42,9 @@ public class Consumer {
     }
 
     public static void main(String[] args) throws Exception {
+        try {args[0] = System.getenv("BATCH_SIZE");}
+        catch (Exception e) {args[0] = "1000";}
+
         KafkaConsumer<String, String>  consumer = new KafkaConsumer<>(getProps());
         consumer.subscribe(Collections.singleton("weather_topic"));
 
@@ -77,7 +80,7 @@ public class Consumer {
                     log.info("Consumed message :" + record);
                     parquetWriter.write(record);
                 }
-                if (countRecords >= BATCH_SIZE) {
+                if (countRecords >= Integer.parseInt(args[0])) {
                     parquetWriter.close();
                     PathsProducer.produce(filePath);
                     countRecords = 0;

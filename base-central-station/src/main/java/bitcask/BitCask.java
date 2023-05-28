@@ -17,7 +17,7 @@ public class BitCask {
     //HashTable
     private HashMap<String, Pointer> hashTable;
 
-    private  ActiveSegment activeSegment;
+    public   ActiveSegment activeSegment;
 
     private CompactionTask compactionTask;
 
@@ -27,7 +27,10 @@ public class BitCask {
         this.segmentsReader = new SegmentsReader();
         this.hashTable = new HashMap<>();
         this.activeSegment = null;
-        recoverMeIfYouCan();
+        this.segment_no = recoverMeIfYouCan() + 1;
+        for(var entry : hashTable.entrySet()){
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
         this.compactionTask = new CompactionTask(segmentsPath);
     }
 
@@ -51,11 +54,13 @@ public class BitCask {
         }
     }
 
-    public void recoverMeIfYouCan() throws Exception {
+    public int recoverMeIfYouCan() throws Exception {
         List<String> hintFiles = getHintFiles();
         String activeFileName = getActiveSegment();
+        int nextActiveNumber = -1;
         if(activeFileName != null){
-            this.activeSegment = new ActiveSegment(segmentsPath, activeFileName.substring(0, activeFileName.length() - 4));
+            nextActiveNumber = extractNumber(activeFileName);
+            System.out.println("\n\n\n\n\n" + nextActiveNumber + "\n\n\n\n\n");
             SegmentsReader.readActiveFile_recovery(segmentsPath + "/" + activeFileName, this.hashTable);
         }
         if(hintFiles != null){
@@ -63,6 +68,7 @@ public class BitCask {
                 SegmentsReader.readAHintFile_recovery(segmentsPath + "/" + hintFileName, this.hashTable);
             }
         }
+        return nextActiveNumber;
     }
 
     private List<String> getHintFiles() throws Exception {
@@ -82,13 +88,14 @@ public class BitCask {
     }
 
     private String getActiveSegment() throws Exception {
+        System.out.println("get Active Segment");
         File directory = new File(this.segmentsPath);
         if (directory.isDirectory()) {
             File[] files = directory.listFiles();
             List<String> filtered_files = Arrays.stream(files).filter(file -> file.getName()
                             .contains("segment")).map(file -> file.getName())
                     .collect(Collectors.toList());
-            filtered_files = filtered_files.stream().filter(file -> !file.contains("replica")).collect(Collectors.toList());
+            filtered_files.removeIf(file -> file.contains("hint") || file.contains("replica")); 
             filtered_files.sort(Comparator.comparingInt(BitCask::extractNumber).reversed());
             return filtered_files.isEmpty() ? null : filtered_files.get(0);
         } else {
@@ -98,10 +105,12 @@ public class BitCask {
 
 
     private static int extractNumber(String fileName) {
+        System.out.println("extract number from fileName " + fileName);
         int startIndex = fileName.indexOf("segment") + "segment".length();
         int endIndex = fileName.indexOf(".bin");
 
         String numberString = fileName.substring(startIndex, endIndex);
+        System.out.println(numberString);
         return Integer.parseInt(numberString);
     }
 

@@ -37,6 +37,7 @@ public class CompactionTask {
     }
 
     public void compactFile(String segmentsPath, String replicaFileName) throws IOException {
+        System.out.println("\n\nCOMPACT FILE\n\n");
         int segment_no = extractNumber(replicaFileName);
         //If the file is active file, don't compact it
         File file = new File(segmentsPath + "/" + "hint_segment" + segment_no + ".bin");
@@ -106,7 +107,7 @@ public class CompactionTask {
             try {
                 List<String> replicaFilesNames = getReplicaFiles();
                 for (String replicaFileName : replicaFilesNames) {
-                    compactFile(segmentsPath, replicaFileName);
+                    deleteIfStale(replicaFileName);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);

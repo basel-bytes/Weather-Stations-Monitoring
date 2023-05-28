@@ -58,6 +58,7 @@ public class ActiveSegment {
     }
 
     public void wrapItUpandClose() throws IOException {
+        System.out.println("wrap it up an close");
         String hintFilePath = this.segmentsDirectoryPath + "/hint_" + this.fileName + ".bin";
         String segmentPath = this.segmentsDirectoryPath + "/" + fileName + ".bin";
         HashMap<String, Pointer> keys_vals = new HashMap<>();
@@ -88,4 +89,14 @@ public class ActiveSegment {
     }
 
 
+    @Override
+    public String toString() {
+        return "ActiveSegment{" +
+                "maxSize=" + maxSize +
+                ", fileName='" + fileName + '\'' +
+                ", segmentsDirectoryPath='" + segmentsDirectoryPath + '\'' +
+                ", byteOffset=" + byteOffset +
+                ", locked=" + locked +
+                '}';
+    }
 }

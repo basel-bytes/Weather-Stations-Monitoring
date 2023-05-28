@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 public class SegmentsWriter {
     private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
 
