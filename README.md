@@ -31,7 +31,7 @@ multiple weather stations that feed a queueing service (Kafka) with their readin
 ![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/dec216b6-d091-4a40-9c65-0dc6095293e2)
 
 ### B) Kafka Processors
-- implemented in [kafka-processing service](./kafka-processor/)
+- Implemented in [kafka-processing service](./kafka-processor/)
 - There are two types of processing following **router integration pattern**:
   
 | Processing Type | Description |
@@ -39,15 +39,39 @@ multiple weather stations that feed a queueing service (Kafka) with their readin
 | Dropping Messages | Processes messages by some probabilistic sampling, then throw some of them away |
 | Raining Areas | Processes messages and detects rain according humidity, then throw messages from rainy areas to some topic. We use Kstream and filters to do such processors |
 
-- All these processing produce undropped messages to weather_topic And all records have humidity >= 70 go to raining topic
+- All these processing produce undropped messages to **weather_topic** And all records have **humidity >= 70** go to **raining topic**.
 
 
 <a name="-data-processing-and-archiving"></a> 
 ## Data Processing And Archiving
+- Data is first consumed from kafka topics then written in batches of **10k messages** in the form of **parquet files** to support efficient analytical queries. 
+- This is implemented in [base-central-station service](./base-central-station/).
+- Massege partiitioning is done via a **Chronological job** that is configured to run every 24 hours at midnight .
+- Such Chronological job is scheduled with the help of **k8s**.
+- the Chronological job is implemented in **scala** using **apache spark** to partition messages in parquet files by **both day and station_id**.
+- see the Chronological job implementation in [sparky-file-partition service](./sparky-file-partition/).
+  ![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/6c78a981-bee9-4202-9866-64ed193e124d)
 
+  
 <a name="-data-indexing"></a> 
 ## Data Indexing
+This is composed of two parts: </br>
+a) [BitCask Storage](#bitcask-storage) </br>
+b) [Elastic Search and Kibana](#elastic-search-and-kibana) </br>
 
+<a name="-bitcask-storage"></a> 
+## Bitcask Storage
+To implement, we should **maintain a key value** store of the station's statuses. To do this efficiently, we implemented the BitCask Riak LSM to maintain an updated store of each station status. The implementation should be as discussed in lectures with some notes:
+- **Hint files** implementation to help in rehash for recovery.
+- **Scheduling compaction** over segment files to avoid disrupting active readers.
+- **No checksums implemented** to detect errors
+- **No tombstones implemented** for deletions as there is no point in deleting some weather station ID entry.
+- **Assumption:** </br>
+   Replica files are the only files deleted in Compaction.
+- 
+
+<a name="-elastic-search-and-kibana"></a> 
+## Elastic Search and Kibana
 
 
 <a name="-how-to-run"></a> 
