@@ -2,7 +2,7 @@
 
 DDIA course project about a distributed system that fetches weather information from multiple sources, archives and visualizes it.
 
-![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/a48080e1-9788-4947-bb0a-4d197177b363)
+![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/4e67c7df-e938-4d8a-8351-ee81214cd39d)
 
 ## Agenda
 - [System Architecture](#system-architecture)
@@ -28,7 +28,10 @@ Multiple weather stations that feed a queueing service (Kafka) with their readin
 - We use a **station factory design pattern** to indicate which type of station we would like to build.
 - We use a **builder design pattern** to build the message to be sent.
 - Messages coming from Open Meteo are brought according to the **Adapter and filter integration pattern**.
-![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/dec216b6-d091-4a40-9c65-0dc6095293e2)
+![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/e8e84e9f-32f2-4a34-9f7d-85640fe94b1d)
+
+
+
 
 ### B) Kafka Processors
 - Implemented in [kafka-processing service](./kafka-processor/).
@@ -108,9 +111,10 @@ b) [Elastic Search and Kibana](#elastic-search-and-kibana) </br>
 - We implemented a **Python script** listening to kafka topic (paths_topic) where the base central station **sends paths of newly-created parquet files**.
 - The **script then a loads a parquet file** and converts it to records and **connects to elasticsearch to upload records**.
 - Here is the Kibana visualisations confirming Battery status distribution of some stations confirming the battery distribution of stations:
-![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/978a1d41-89aa-42e7-a1c3-50b7172c738c)
+![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/5adae40f-c1cf-41d9-b4b5-e62c031b20e2)
+
 - Here is also Kibana visualisations calculating the percentage of dropped messages from stations confirming the required percentage 10%:
-![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/17a3f9ad-7998-4211-8005-9cf73ae3e29e) 
+![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/86d3962b-6ca2-42a2-a430-531b725e5787)
 
 
 <a name="-how-to-run"></a> 
