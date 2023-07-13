@@ -1,10 +1,9 @@
-FROM hseeberger/scala-sbt:11.0.11_1.5.5_2.13.6
+FROM bitnami/spark:3.1.1
 
 WORKDIR /sparky
 
-COPY build.sbt .
-COPY archive ./archive
-COPY src ./src
-RUN sbt clean compile
+COPY script.scala .
 
-CMD ["sbt", "run"]
+COPY archive ./archive
+
+RUN cat script.scala | spark-shell
