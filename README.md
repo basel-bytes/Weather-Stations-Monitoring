@@ -1,5 +1,7 @@
 ﻿# Weather-Stations-Monitoring
 
+DDIA course project about a distributed system that fetches weather information from multiple sources, archives and visualizes it.
+
 ![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/a48080e1-9788-4947-bb0a-4d197177b363)
 
 ## Agenda
@@ -16,20 +18,20 @@ The 3 major components are:
 
 <a name="-data-acquisition"></a> 
 ## Data Acquisition
-multiple weather stations that feed a queueing service (Kafka) with their readings.</br>
+Multiple weather stations that feed a queueing service (Kafka) with their readings.</br>
 ### A) Weather Stations
-- implemented in [weather-station service](./weather-station/)
+- Implemented in [weather-station service](./weather-station/)
 - We have 2 types of stations: **Mock Stations**, and **Adapter Stations**.
 - Mock Stations are required to randomise its weather readings.
-- Adapter Stations get results from Open-Meteo according to a latitude and longitude given at the beginning
-- Both types will have the same battery distribution and dropping percentages.
+- Adapter Stations get results from Open-Meteo according to a latitude and longitude given at the beginning.
+- Both types will have the same **battery distribution(30% low - 40% medium - 30% high)** and dropping percentage of **10%**.
 - We use a **station factory design pattern** to indicate which type of station we would like to build.
 - We use a **builder design pattern** to build the message to be sent.
 - Messages coming from Open Meteo are brought according to the **Adapter and filter integration pattern**.
 ![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/dec216b6-d091-4a40-9c65-0dc6095293e2)
 
 ### B) Kafka Processors
-- Implemented in [kafka-processing service](./kafka-processor/)
+- Implemented in [kafka-processing service](./kafka-processor/).
 - There are two types of processing following **router integration pattern**:
   
 | Processing Type | Description |
@@ -60,11 +62,11 @@ b) [Elastic Search and Kibana](#elastic-search-and-kibana) </br>
 
 <a name="-bitcask-storage"></a> 
 ## Bitcask Storage
-- implemented in [bitCask](./base-central-station/src/main/java/bitcask/)
+- Implemented in [bitCask](./base-central-station/src/main/java/bitcask/).
 - We implemented the BitCask Riak LSM to maintain an updated store of each station status as discussed in [the book](https://drive.google.com/file/d/120RsgrUsgNFkg1hChAG05LI6LS09sM-p/view?usp=drive_link) with some notes:
   *  **Scheduling compaction** over segment files to avoid disrupting active readers.
-  *  **No checksums implemented** to detect errors
-  *  **No tombstones implemented** for deletions as there is no point in deleting some weather station ID entry. We just deleted Replica files on Compaction 
+  *  **No checksums implemented** to detect errors.
+  *  **No tombstones implemented** for deletions as there is no point in deleting some weather station ID entry. We just deleted Replica files on Compaction.
   *  here is the structure of entry in segment files: </br>
 
       | **ENTRY:** | timestamp | key_size | value_size | key| value |
@@ -102,9 +104,28 @@ b) [Elastic Search and Kibana](#elastic-search-and-kibana) </br>
 
 <a name="-elastic-search-and-kibana"></a> 
 ## Elastic Search and Kibana
+- Implemented in [elastic-search-and-kibana](./elastic-search-and-kibana/).
+- We implemented a **Python script** listening to kafka topic (paths_topic) where the base central station **sends paths of newly-created parquet files**.
+- The **script then a loads a parquet file** and converts it to records and **connects to elasticsearch to upload records**.
+- Here is the Kibana visualisations confirming Battery status distribution of some stations confirming the battery distribution of stations:
+![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/978a1d41-89aa-42e7-a1c3-50b7172c738c)
+- Here is also Kibana visualisations calculating the percentage of dropped messages from stations confirming the required percentage 10%:
+![image](https://github.com/basel-bytes/Weather-Stations-Monitoring/assets/95547833/17a3f9ad-7998-4211-8005-9cf73ae3e29e) 
 
 
 <a name="-how-to-run"></a> 
 ## How To Run
+This project is designed to be deployed on Kubernetes, so you should follow the following steps to run it: 
+1) Build a docker image from the dockerfile in each service with the following names:
 
-
+    | Service | Image Name: Version|
+    | --- | --- | 
+    | [weather-station](./weather-station/) | weather-station-image:latest|
+    | [kafka-processor](./kafka-processor/) | kafka-processor-image:latest |
+    | [base-central-station](./base-central-station/) | base-central-station-image:latest |
+    | [sparky-file-partition](./sparky-file-partition/) | sparky-file-partition-image:latest |
+    | [elastic-search-and-kibana](./elastic-search-and-kibana/) | elastic-loader-image:latest |
+  
+2) Use the following command to load the docker images into k8s: </br>
+  `minikube image load <image name>`
+3) Apply all k8s YAML files in [k8s directory](./k8s/).
